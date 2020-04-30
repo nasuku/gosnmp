@@ -57,6 +57,7 @@ func setupConnection(t *testing.T) {
 
 	Default.Target = target
 	Default.Port = port
+	Default.Timeout = time.Duration(20) * time.Second
 
 	err := Default.Connect()
 	if err != nil {
