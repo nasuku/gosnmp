@@ -18,6 +18,7 @@ import (
 	"net"
 	"strconv"
 	"sync/atomic"
+	"syscall"
 	"time"
 )
 
@@ -120,6 +121,10 @@ type GoSNMP struct {
 
 	// Internal - used to sync requests to responses - snmpv3
 	msgID uint32
+
+	// Optional - set net.Dialer behavior
+	DialControl func(network, address string, c syscall.RawConn) error
+
 }
 
 // Default connection settings
@@ -273,7 +278,7 @@ func (x *GoSNMP) connect(networkSuffix string) error {
 func (x *GoSNMP) netConnect() error {
 	var err error
 	addr := net.JoinHostPort(x.Target, strconv.Itoa(int(x.Port)))
-	dialer := net.Dialer{Timeout: x.Timeout}
+	dialer := net.Dialer{Timeout: x.Timeout, Control: x.DialControl}
 	x.Conn, err = dialer.DialContext(x.Context, x.Transport, addr)
 	return err
 }
